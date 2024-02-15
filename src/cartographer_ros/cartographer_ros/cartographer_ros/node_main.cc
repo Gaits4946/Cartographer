@@ -30,6 +30,8 @@
  * 当参数被定义后, 通过FLAGS_name就可访问到对应的参数
  */
 // collect_metrics ：激活运行时度量的集合.如果激活, 可以通过ROS服务访问度量
+// HT: 调用时需要加上"FLAGS_"前缀, 例如 FLAGS_collect_metrics;
+// HT: 参数的配置是通过*.launch文件定义;
 DEFINE_bool(collect_metrics, false,
             "Activates the collection of runtime metrics. If activated, the "
             "metrics can be accessed via a ROS service.");

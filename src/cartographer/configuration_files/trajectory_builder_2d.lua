@@ -13,14 +13,14 @@
 -- limitations under the License.
 
 TRAJECTORY_BUILDER_2D = {
-  use_imu_data = true,            -- 是否使用imu数据
+  use_imu_data = true,            -- 是否使用imu数据 (HT: 默认值)
   min_range = 0.,                 -- 雷达数据的最远最近滤波, 保存中间值
   max_range = 30.,
   min_z = -0.8,                   -- 雷达数据的最高与最低的过滤, 保存中间值
   max_z = 2.,
   missing_data_ray_length = 5.,   -- 超过最大距离范围的数据点用这个距离代替
   num_accumulated_range_data = 1, -- 几帧有效的点云数据进行一次扫描匹配
-  voxel_filter_size = 0.025,      -- 体素滤波的立方体的边长
+  voxel_filter_size = 0.025,      -- 体素滤波的立方体的边长 (HT: cartographer内部的滤波)
 
   -- 使用固定的voxel滤波之后, 再使用自适应体素滤波器
   -- 体素滤波器 用于生成稀疏点云 以进行 扫描匹配
@@ -39,6 +39,7 @@ TRAJECTORY_BUILDER_2D = {
 
   -- 是否使用 real_time_correlative_scan_matcher 为ceres提供先验信息
   -- 计算复杂度高 , 但是很鲁棒 , 在odom或者imu不准时依然能达到很好的效果
+  -- (HT: 一般用单线lidar时open)
   use_online_correlative_scan_matching = false,
   real_time_correlative_scan_matcher = {
     linear_search_window = 0.1,             -- 线性搜索窗口的大小
@@ -49,9 +50,9 @@ TRAJECTORY_BUILDER_2D = {
 
   -- ceres匹配的一些配置参数
   ceres_scan_matcher = {
-    occupied_space_weight = 1.,
-    translation_weight = 10.,
-    rotation_weight = 40.,
+    occupied_space_weight = 1., --(HT: 比较重要, 点云和地图匹配的权重)
+    translation_weight = 10., --(HT: 比较重要, 匹配位姿和先验位姿平移偏差量)
+    rotation_weight = 40., --(HT: 比较重要, 匹配位姿和先验位姿旋转偏差量)
     ceres_solver_options = {
       use_nonmonotonic_steps = false,
       max_num_iterations = 20,
@@ -95,10 +96,10 @@ TRAJECTORY_BUILDER_2D = {
 
   -- 子图相关的一些配置
   submaps = {
-    num_range_data = 90,          -- 一个子图里插入雷达数据的个数的一半
+    num_range_data = 90,          -- 一个子图里插入雷达数据的个数的一半 (HT: 比较重要, 一个submap最多插入180帧点云数据, 内部会*2)
     grid_options_2d = {
       grid_type = "PROBABILITY_GRID", -- 地图的种类, 还可以是tsdf格式
-      resolution = 0.05,
+      resolution = 0.05, -- (HT: 建图的分辨率)
     },
     range_data_inserter = {
       range_data_inserter_type = "PROBABILITY_GRID_INSERTER_2D",

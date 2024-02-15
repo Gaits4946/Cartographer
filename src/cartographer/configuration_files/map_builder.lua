@@ -14,10 +14,11 @@
 
 include "pose_graph.lua"
 
+-- use_trajectory_builder_2d/use_trajectory_builder_3d 只能有1个true
 MAP_BUILDER = {
   use_trajectory_builder_2d = false,
   use_trajectory_builder_3d = false,
-  num_background_threads = 4,
+  num_background_threads = 4, --(HT: 后端线程数)
   pose_graph = POSE_GRAPH,
   collate_by_trajectory = false,
 }

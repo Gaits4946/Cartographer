@@ -40,9 +40,15 @@ struct NodeOptions {
   bool use_pose_extrapolator = true;
 };
 
+/*
+* HT: 20240213-读取lua文件中的参数, 并返回NodeOptions成员;
+*/
 NodeOptions CreateNodeOptions(
     ::cartographer::common::LuaParameterDictionary* lua_parameter_dictionary);
 
+/*
+* HT: 20240213-构建Tuple成员并返回;
+*/
 std::tuple<NodeOptions, TrajectoryOptions> LoadOptions(
     const std::string& configuration_directory,
     const std::string& configuration_basename);

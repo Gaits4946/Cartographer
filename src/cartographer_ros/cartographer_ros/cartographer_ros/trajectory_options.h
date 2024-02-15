@@ -48,6 +48,9 @@ struct TrajectoryOptions {
   double landmarks_sampling_ratio;
 };
 
+/*
+* HT: 20240213-读取lua文件中的参数, 并返回 TrajectoryOptions 成员;
+*/
 TrajectoryOptions CreateTrajectoryOptions(
     ::cartographer::common::LuaParameterDictionary* lua_parameter_dictionary);
 

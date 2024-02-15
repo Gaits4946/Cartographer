@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-
+<!--HT: ROS工程中才需要配置package.xml文件, cartographer本身不需要. -->
 <package format="2">
   <name>cartographer_ros</name>
   <version>1.0.0</version>

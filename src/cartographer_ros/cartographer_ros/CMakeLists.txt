@@ -45,7 +45,7 @@ find_package(Boost REQUIRED COMPONENTS system iostreams)
 find_package(PCL REQUIRED COMPONENTS common io)
 
 find_package(cartographer REQUIRED)
-include("${CARTOGRAPHER_CMAKE_DIR}/functions.cmake")
+include("${CARTOGRAPHER_CMAKE_DIR}/functions.cmake")  # HT: 引用/cartographer/cmake/functions.cmake文件
 option(BUILD_GRPC "build features that require Cartographer gRPC support" false)
 google_initialize_cartographer_project()
 # google_enable_testing()

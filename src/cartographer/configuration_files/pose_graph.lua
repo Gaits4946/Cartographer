@@ -76,7 +76,7 @@ POSE_GRAPH = {
 
   -- 优化残差方程的相关参数
   optimization_problem = {
-    huber_scale = 1e1,                -- 值越大,（潜在）异常值的影响就越大
+    huber_scale = 1e1,                -- 值越大,（潜在）异常值的影响就越大 (HT: huber核, 异常值的影响)
     acceleration_weight = 1.1e2,      -- 3d里imu的线加速度的权重
     rotation_weight = 1.6e4,          -- 3d里imu的旋转的权重
     
@@ -93,7 +93,7 @@ POSE_GRAPH = {
     fixed_frame_pose_tolerant_loss_param_a = 1,
     fixed_frame_pose_tolerant_loss_param_b = 1,
 
-    log_solver_summary = false,
+    log_solver_summary = false, --(HT: 是否打印ceres优化后的结果)
     use_online_imu_extrinsics_in_3d = true,
     fix_z_in_3d = false,
     ceres_solver_options = {

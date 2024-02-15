@@ -545,7 +545,19 @@ Node::ComputeExpectedSensorIds(const TrajectoryOptions& options) const {
       std::string id;   // topic的名字
     };
   */
- 
+
+  /*
+  * HT: 20240215-cartographer传感器整理.
+  * 激光扫描(num_laser_scans): 0-n;
+  * 多回波激光扫描(num_multi_echo_laser_scans): 0-n;
+  * 点云(num_point_clouds): 0-n;
+  * IMU(use_imu_data): 3D_1 | 2D_0-1;
+  * 里程计(use_odometry): 0-1;
+  * GPS(use_nav_sat): 0-1;
+  * 坐标(use_landmarks): 0-1;
+  */
+
+  // HT: 20240215-using可以将1个已有类型名或命名空间创建1个别名, 也可以重新模板, 与typedef类似但不一样.
   using SensorId = cartographer::mapping::TrajectoryBuilderInterface::SensorId;
   using SensorType = SensorId::SensorType;
   std::set<SensorId> expected_topics;

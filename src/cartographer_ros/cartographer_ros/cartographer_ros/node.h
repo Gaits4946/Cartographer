@@ -57,6 +57,7 @@ namespace cartographer_ros {
 // 将ROS的话题传入SLAM
 class Node {
  public:
+  // HT: 20240214-tf2_ros提供了用于发布和使用变化的ROS节点和接口. 可以在ROS系统中方便地处理坐标系间的变换.
   Node(const NodeOptions& node_options,
        std::unique_ptr<cartographer::mapping::MapBuilderInterface> map_builder,
        tf2_ros::Buffer* tf_buffer, bool collect_metrics);
@@ -157,6 +158,7 @@ class Node {
 
   // Returns the set of SensorIds expected for a trajectory.
   // 'SensorId::id' is the expected ROS topic name.
+  // HT: 20240215-函数后加const表示该函数是一个常量成员函数, 保证class对象在被声明为const对象时, 可以调用const函数(此时非const函数不能被调用).
   std::set<::cartographer::mapping::TrajectoryBuilderInterface::SensorId>
   ComputeExpectedSensorIds(const TrajectoryOptions& options) const;
   int AddTrajectory(const TrajectoryOptions& options);

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# HT: 负责定义工程编译所需要的公式
 include(CMakeParseArguments)
 
 macro(_parse_arguments ARGS)

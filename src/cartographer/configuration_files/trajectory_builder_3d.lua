@@ -12,6 +12,7 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+-- HT: 基本和2d的lua相同
 MAX_3D_RANGE = 60.
 INTENSITY_THRESHOLD = 40
 
@@ -95,6 +96,7 @@ TRAJECTORY_BUILDER_3D = {
     },
   },
 
+-- HT: 3d设置了high/low 2种
   submaps = {
     -- 2种分辨率的地图
     high_resolution = 0.10,           -- 用于近距离测量的高分辨率hybrid网格 for local SLAM and loop closure, 用来与小尺寸voxel进行精匹配
