@@ -209,6 +209,7 @@ class Node {
   ::ros::Publisher scan_matched_point_cloud_publisher_;
   
   // 控制各个传感器数据的采样频率
+  // HT: 定义各传感器的使用频率.
   struct TrajectorySensorSamplers {
     TrajectorySensorSamplers(const double rangefinder_sampling_ratio,
                              const double odometry_sampling_ratio,

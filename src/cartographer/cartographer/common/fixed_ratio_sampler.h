@@ -29,14 +29,17 @@ namespace common {
 // 当应该从数据流中抽取样本以选择数据的均匀分布部分时发出信号
 class FixedRatioSampler {
  public:
+  // HT: 20240216-explicit禁止隐式转换.
   explicit FixedRatioSampler(double ratio);
   ~FixedRatioSampler();
 
+  // HT: 20240216-" = delete"使函数禁止被调用.
   FixedRatioSampler(const FixedRatioSampler&) = delete;
   FixedRatioSampler& operator=(const FixedRatioSampler&) = delete;
 
   // Returns true if this pulse should result in an sample.
   // 在比例小于ratio_时返回true, ratio_设置为1时都返回true, 也就是说使用所有的数据
+  // HT: 20230216-"ratio_"代表采样频率, 1代表1/1全采样, 0.5代表1/2两次采一次.
   bool Pulse();
 
   // Returns a debug string describing the current ratio of samples to pulses.

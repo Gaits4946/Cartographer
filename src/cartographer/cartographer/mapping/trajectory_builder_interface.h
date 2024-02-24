@@ -111,6 +111,9 @@ class TrajectoryBuilderInterface {
   TrajectoryBuilderInterface& operator=(const TrajectoryBuilderInterface&) =
       delete;
 
+  /*
+  * HT: 20240215-纯虚函数后面需要加"=0". 所以函数的具体实现需要有子class来完成.
+  */
   virtual void AddSensorData(
       const std::string& sensor_id,
       const sensor::TimedPointCloudData& timed_point_cloud_data) = 0;
