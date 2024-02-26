@@ -173,7 +173,7 @@ class Rigid3 {
   //     [0 1]        [0         1    ] 
   // R是旋转矩阵, 特殊正交群, 所以R^-1 = R^T
   Rigid3 inverse() const {
-    const Quaternion rotation = rotation_.conjugate();
+    const Quaternion rotation = rotation_.conjugate(); // conjugate()是求共轭函数
     const Vector translation = -(rotation * translation_);
     return Rigid3(translation, rotation);
   }
@@ -200,6 +200,9 @@ class Rigid3 {
 // lhs.rotation() * rhs.translation() + lhs.translation() 的意思是
 // 将 rhs 转换成 lhs自身坐标系下的位姿变动量 再与lhs的坐标相加
 // 得到 lhs 在全局坐标系下的新的位姿
+/*
+* HT: 20240226-坐标变换, 将相对坐标转化为全局坐标. 对应课程4.1节中公式推到问题2.
+*/
 template <typename FloatType>
 Rigid3<FloatType> operator*(const Rigid3<FloatType>& lhs,
                             const Rigid3<FloatType>& rhs) {
@@ -208,6 +211,9 @@ Rigid3<FloatType> operator*(const Rigid3<FloatType>& lhs,
       (lhs.rotation() * rhs.rotation()).normalized());
 }
 
+/*
+* HT: 20240226-坐标变换,点乘.
+*/
 template <typename FloatType>
 typename Rigid3<FloatType>::Vector operator*(
     const Rigid3<FloatType>& rigid,

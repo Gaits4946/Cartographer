@@ -70,6 +70,9 @@ std::unique_ptr<carto::sensor::OdometryData> SensorBridge::ToOdometryData(
   }
 
   // 将里程计的footprint的pose转成tracking_frame的pose, 再转成carto的里程计数据类型
+  /*
+  *  HT: 202402025-ToRigid3d实现了三位刚体的坐标变换.
+  */
   return absl::make_unique<carto::sensor::OdometryData>(
       carto::sensor::OdometryData{
           time, ToRigid3d(msg->pose.pose) * sensor_to_tracking->inverse()});

@@ -654,6 +654,9 @@ visualization_msgs::MarkerArray MapBuilderBridge::GetConstraintList() {
 
 // 获取对应轨迹id的SensorBridge的指针
 SensorBridge* MapBuilderBridge::sensor_bridge(const int trajectory_id) {
+  /*
+  * HT: 20240224-unique_ptr不能传递,只能通过get()获取其原始值.
+  */
   return sensor_bridges_.at(trajectory_id).get();
 }
 

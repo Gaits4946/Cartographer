@@ -97,21 +97,43 @@ class Node {
           expected_sensor_ids,
       const TrajectoryOptions& options);
 
+
   // The following functions handle adding sensor data to a trajectory.
+  /*
+  * HT: 20240224-里程记数据接口
+  */
   void HandleOdometryMessage(int trajectory_id, const std::string& sensor_id,
                              const nav_msgs::Odometry::ConstPtr& msg);
+  /*
+  * HT: 20240224-Gps数据接口
+  */
   void HandleNavSatFixMessage(int trajectory_id, const std::string& sensor_id,
                               const sensor_msgs::NavSatFix::ConstPtr& msg);
+  /*
+  * HT: 20240224-Landmark数据接口
+  */
   void HandleLandmarkMessage(
       int trajectory_id, const std::string& sensor_id,
       const cartographer_ros_msgs::LandmarkList::ConstPtr& msg);
+  /*
+  * HT: 20240224-Imu数据接口
+  */
   void HandleImuMessage(int trajectory_id, const std::string& sensor_id,
                         const sensor_msgs::Imu::ConstPtr& msg);
+  /*
+  * HT: 20240224-单线激光雷达数据接口
+  */
   void HandleLaserScanMessage(int trajectory_id, const std::string& sensor_id,
                               const sensor_msgs::LaserScan::ConstPtr& msg);
+  /*
+  * HT: 20240224-多回声波雷达数据接口
+  */
   void HandleMultiEchoLaserScanMessage(
       int trajectory_id, const std::string& sensor_id,
       const sensor_msgs::MultiEchoLaserScan::ConstPtr& msg);
+  /*
+  * HT: 20240224-点云数据接口
+  */
   void HandlePointCloud2Message(int trajectory_id, const std::string& sensor_id,
                                 const sensor_msgs::PointCloud2::ConstPtr& msg);
 
@@ -196,6 +218,9 @@ class Node {
   // GUARDED_BY是数据成员的属性, 该属性声明数据成员受给定功能保护.
   // 对数据的读操作需要共享访问, 而写操作则需要互斥访问.
   // 官方介绍文档: https://clang.llvm.org/docs/ThreadSafetyAnalysis.html
+  /*
+  * HT: 20240224-GUARDED_BY(mutex_)要求在使用时一定要加锁.
+  */
   MapBuilderBridge map_builder_bridge_ GUARDED_BY(mutex_);
 
   ::ros::NodeHandle node_handle_;
@@ -234,6 +259,10 @@ class Node {
   // 对于需要高效率查询的情况, 使用unordered_map容器, 但是unordered_map对于迭代器遍历效率并不高
 
   // These are keyed with 'trajectory_id'.
+  /*
+  * HT: 20240224-位姿推测器类, 这个位姿推测器与 前端先验位姿推测器相互独立. 主要作用是融合Imu和里程记输出推测后的位子, 
+  * 根据参数(lua文件中use_pose_extrapolator参数)决定是否输出融合后的tf(主要是有Imu和里程记的精度).
+  */
   std::map<int, ::cartographer::mapping::PoseExtrapolator> extrapolators_;
   std::map<int, ::ros::Time> last_published_tf_stamps_;
   std::unordered_map<int, TrajectorySensorSamplers> sensor_samplers_;

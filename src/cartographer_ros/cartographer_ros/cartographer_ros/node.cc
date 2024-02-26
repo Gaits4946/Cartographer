@@ -1131,15 +1131,27 @@ void Node::HandleOdometryMessage(const int trajectory_id,
                                  const std::string& sensor_id,
                                  const nav_msgs::Odometry::ConstPtr& msg) {
   absl::MutexLock lock(&mutex_);
+  /*
+  * 判断里程记是否处于暂停状态
+  */
   if (!sensor_samplers_.at(trajectory_id).odometry_sampler.Pulse()) {
     return;
   }
   auto sensor_bridge_ptr = map_builder_bridge_.sensor_bridge(trajectory_id);
+  /*
+  * 进行里程记的数据格式转换
+  */
   auto odometry_data_ptr = sensor_bridge_ptr->ToOdometryData(msg);
   // extrapolators_使用里程计数据进行位姿预测
   if (odometry_data_ptr != nullptr) {
+    /*
+    * HT: 20240224-用于位姿预测
+    */
     extrapolators_.at(trajectory_id).AddOdometryData(*odometry_data_ptr);
   }
+  /*
+  * HT: 20240224-使用其传感器处理函数进行里程计数据处理
+  */
   sensor_bridge_ptr->HandleOdometryMessage(sensor_id, msg);
 }
 
@@ -1151,6 +1163,9 @@ void Node::HandleNavSatFixMessage(const int trajectory_id,
   if (!sensor_samplers_.at(trajectory_id).fixed_frame_pose_sampler.Pulse()) {
     return;
   }
+  /*
+  * HT: 20240224-使用其传感器处理函数进行Gps数据处理
+  */
   map_builder_bridge_.sensor_bridge(trajectory_id)
       ->HandleNavSatFixMessage(sensor_id, msg);
 }
@@ -1163,6 +1178,9 @@ void Node::HandleLandmarkMessage(
   if (!sensor_samplers_.at(trajectory_id).landmark_sampler.Pulse()) {
     return;
   }
+  /*
+  * HT: 20240224-使用其传感器处理函数进行Landmark数据处理
+  */
   map_builder_bridge_.sensor_bridge(trajectory_id)
       ->HandleLandmarkMessage(sensor_id, msg);
 }
@@ -1187,8 +1205,14 @@ void Node::HandleImuMessage(const int trajectory_id,
   auto imu_data_ptr = sensor_bridge_ptr->ToImuData(msg);
   // extrapolators_使用里程计数据进行位姿预测
   if (imu_data_ptr != nullptr) {
+    /*
+    * HT: 20240224-用于位姿预测与重力方向的确定
+    */
     extrapolators_.at(trajectory_id).AddImuData(*imu_data_ptr);
   }
+  /*
+  * HT: 20240224-使用其传感器处理函数进行Imu数据处理
+  */
   sensor_bridge_ptr->HandleImuMessage(sensor_id, msg);
 }
 
@@ -1201,6 +1225,9 @@ void Node::HandleLaserScanMessage(const int trajectory_id,
   if (!sensor_samplers_.at(trajectory_id).rangefinder_sampler.Pulse()) {
     return;
   }
+  /*
+  * HT: 20240224-使用其传感器处理函数进行单线激光雷达数据处理
+  */
   map_builder_bridge_.sensor_bridge(trajectory_id)
       ->HandleLaserScanMessage(sensor_id, msg);
 }
@@ -1213,6 +1240,9 @@ void Node::HandleMultiEchoLaserScanMessage(
   if (!sensor_samplers_.at(trajectory_id).rangefinder_sampler.Pulse()) {
     return;
   }
+  /*
+  * HT: 20240224-使用其传感器处理函数进行多回声波雷达数据处理
+  */
   map_builder_bridge_.sensor_bridge(trajectory_id)
       ->HandleMultiEchoLaserScanMessage(sensor_id, msg);
 }
@@ -1225,6 +1255,9 @@ void Node::HandlePointCloud2Message(
   if (!sensor_samplers_.at(trajectory_id).rangefinder_sampler.Pulse()) {
     return;
   }
+  /*
+  * HT: 20240224-使用其传感器处理函数进行点云数据处理
+  */
   map_builder_bridge_.sensor_bridge(trajectory_id)
       ->HandlePointCloud2Message(sensor_id, msg);
 }
