@@ -84,6 +84,11 @@ class SensorBridge {
                          const std::string& frame_id,
                          const ::cartographer::sensor::TimedPointCloud& ranges);
 
+  /*
+  * HT: 20240303-num_subdivisions_per_laser_scan_定义将雷达分为几帧数据
+  * sensor_to_previous_subdivision_time_定义子图的时间
+  * ecef_to_local_frame_定义ecef到local的坐标变换
+  */
   const int num_subdivisions_per_laser_scan_;
   std::map<std::string, cartographer::common::Time>
       sensor_to_previous_subdivision_time_;

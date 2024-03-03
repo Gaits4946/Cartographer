@@ -55,14 +55,14 @@ SensorBridge::SensorBridge(
     const double lookup_transform_timeout_sec, tf2_ros::Buffer* const tf_buffer,
     carto::mapping::TrajectoryBuilderInterface* const trajectory_builder)
     : num_subdivisions_per_laser_scan_(num_subdivisions_per_laser_scan),
-      tf_bridge_(tracking_frame, lookup_transform_timeout_sec, tf_buffer),
+      tf_bridge_(tracking_frame, lookup_transform_timeout_sec, tf_buffer), // lookup_transform_timeout_sec-查询超时时间
       trajectory_builder_(trajectory_builder) {}
 
 // 将ros格式的里程计数据 转成tracking frame的pose, 再转成carto的里程计数据类型
 std::unique_ptr<carto::sensor::OdometryData> SensorBridge::ToOdometryData(
     const nav_msgs::Odometry::ConstPtr& msg) {
-  const carto::common::Time time = FromRos(msg->header.stamp);
-  // 找到 tracking坐标系 到 里程计的child_frame_id 的坐标变换, 所以下方要对sensor_to_tracking取逆
+  const carto::common::Time time = FromRos(msg->header.stamp); // 时间转换
+  // 找到 tracking坐标系(imu) 到 里程计的child_frame_id 的坐标变换, 所以下方要对sensor_to_tracking取逆
   const auto sensor_to_tracking = tf_bridge_.LookupToTracking(
       time, CheckNoLeadingSlash(msg->child_frame_id));
   if (sensor_to_tracking == nullptr) {

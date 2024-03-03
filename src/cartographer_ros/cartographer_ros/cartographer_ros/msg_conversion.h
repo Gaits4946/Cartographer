@@ -34,6 +34,11 @@
 
 namespace cartographer_ros {
 
+/*
+* HT: 20240303
+* 将msg结构定义的数据转换为cartographer定义的对应数据结构的数据
+*/
+
 sensor_msgs::PointCloud2 ToPointCloud2Message(
     int64_t timestamp, const std::string& frame_id,
     const ::cartographer::sensor::TimedPointCloud& point_cloud);

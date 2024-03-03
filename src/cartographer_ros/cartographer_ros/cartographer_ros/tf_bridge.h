@@ -39,6 +39,13 @@ class TfBridge {
   std::unique_ptr<::cartographer::transform::Rigid3d> LookupToTracking(
       ::cartographer::common::Time time, const std::string& frame_id) const;
 
+ /*
+ * HT: 20240303
+ * tracking_frame_:
+ * lookup_transform_timeout_sec_-帧超时时间
+ * 
+ * 
+ */
  private:
   const std::string tracking_frame_;
   const double lookup_transform_timeout_sec_;
