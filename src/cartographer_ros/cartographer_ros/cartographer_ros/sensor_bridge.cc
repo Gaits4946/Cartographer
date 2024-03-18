@@ -97,6 +97,13 @@ void SensorBridge::HandleNavSatFixMessage(
     const std::string& sensor_id, const sensor_msgs::NavSatFix::ConstPtr& msg) {
   const carto::common::Time time = FromRos(msg->header.stamp);
   // 如果不是固定解,就加入一个固定的空位姿
+  /*
+  * HT: 20240310
+  * 1. 如果status是NO_Fix,结果就不可靠. 
+  * 2. 并且, 在车辆过桥洞时,FIX解也不可靠.
+  * 3. FIX状态,但是协方差很大也不可靠.
+  * 此处尽判断NO_FIX状态.
+  */
   if (msg->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX) {
     trajectory_builder_->AddSensorData(
         sensor_id,
@@ -105,6 +112,10 @@ void SensorBridge::HandleNavSatFixMessage(
   }
 
   // 确定ecef原点到局部坐标系的坐标变换
+  /*
+  * HT: 20240310
+  * 仅确认第一帧数据的ECEF
+  */
   if (!ecef_to_local_frame_.has_value()) {
     ecef_to_local_frame_ =
         ComputeLocalFrameFromLatLong(msg->latitude, msg->longitude);
@@ -112,6 +123,10 @@ void SensorBridge::HandleNavSatFixMessage(
               << msg->latitude << ", long = " << msg->longitude << ".";
   }
 
+  /*
+  * HT: 20240310
+  * 通过GPS计算相对坐标
+  */
   // 通过这个坐标变换 乘以 之后的gps数据,就相当于减去了一个固定的坐标,从而得到了gps数据间的相对坐标变换
   trajectory_builder_->AddSensorData(
       sensor_id, carto::sensor::FixedFramePoseData{
@@ -191,9 +206,13 @@ void SensorBridge::HandleImuMessage(const std::string& sensor_id,
 // 处理LaserScan数据, 先转成点云,再传入trajectory_builder_
 void SensorBridge::HandleLaserScanMessage(
     const std::string& sensor_id, const sensor_msgs::LaserScan::ConstPtr& msg) {
+  /*
+  * HT: 20240318
+  * 单线雷达处理函数
+  */
   carto::sensor::PointCloudWithIntensities point_cloud;
   carto::common::Time time;
-  std::tie(point_cloud, time) = ToPointCloudWithIntensities(*msg);
+  std::tie(point_cloud, time) = ToPointCloudWithIntensities(*msg); // 此函数被重载
   HandleLaserScan(sensor_id, time, msg->header.frame_id, point_cloud);
 }
 
@@ -201,9 +220,13 @@ void SensorBridge::HandleLaserScanMessage(
 void SensorBridge::HandleMultiEchoLaserScanMessage(
     const std::string& sensor_id,
     const sensor_msgs::MultiEchoLaserScan::ConstPtr& msg) {
+  /*
+  * HT: 20240318
+  * 多回声波雷达处理函数
+  */
   carto::sensor::PointCloudWithIntensities point_cloud;
   carto::common::Time time;
-  std::tie(point_cloud, time) = ToPointCloudWithIntensities(*msg);
+  std::tie(point_cloud, time) = ToPointCloudWithIntensities(*msg); // 此函数被重载
   HandleLaserScan(sensor_id, time, msg->header.frame_id, point_cloud);
 }
 
@@ -211,10 +234,14 @@ void SensorBridge::HandleMultiEchoLaserScanMessage(
 void SensorBridge::HandlePointCloud2Message(
     const std::string& sensor_id,
     const sensor_msgs::PointCloud2::ConstPtr& msg) {
+  /*
+  * HT: 20240318
+  * 点云处理函数
+  */
   carto::sensor::PointCloudWithIntensities point_cloud;
   carto::common::Time time;
-  std::tie(point_cloud, time) = ToPointCloudWithIntensities(*msg);
-  HandleRangefinder(sensor_id, time, msg->header.frame_id, point_cloud.points);
+  std::tie(point_cloud, time) = ToPointCloudWithIntensities(*msg); // 此函数被重载
+  HandleRangefinder(sensor_id, time, msg->header.frame_id, point_cloud.points); // 和前2种激光雷达处理函数不同
 }
 
 const TfBridge& SensorBridge::tf_bridge() const { return tf_bridge_; }

@@ -144,6 +144,10 @@ float GetFirstEcho(const sensor_msgs::LaserEcho& echo) {
 template <typename LaserMessageType>
 std::tuple<PointCloudWithIntensities, ::cartographer::common::Time>
 LaserScanToPointCloudWithIntensities(const LaserMessageType& msg) {
+  /*
+  * HT:20240318
+  * 模板函数,处理单线激光和多会声波雷达
+  */
   CHECK_GE(msg.range_min, 0.f);
   CHECK_GE(msg.range_max, msg.range_min);
   if (msg.angle_increment > 0.f) {
@@ -237,18 +241,22 @@ sensor_msgs::PointCloud2 ToPointCloud2Message(
   return msg;
 }
 
+/*
+* HT: 20240318
+* 重载激光雷达共同调用的函数
+*/
 // 由ros格式的LaserScan转成carto格式的PointCloudWithIntensities
 std::tuple<::cartographer::sensor::PointCloudWithIntensities,
            ::cartographer::common::Time>
 ToPointCloudWithIntensities(const sensor_msgs::LaserScan& msg) {
-  return LaserScanToPointCloudWithIntensities(msg);
+  return LaserScanToPointCloudWithIntensities(msg); // 使用模板函数实现不同功能
 }
 
 // 由ros格式的MultiEchoLaserScan转成carto格式的PointCloudWithIntensities
 std::tuple<::cartographer::sensor::PointCloudWithIntensities,
            ::cartographer::common::Time>
 ToPointCloudWithIntensities(const sensor_msgs::MultiEchoLaserScan& msg) {
-  return LaserScanToPointCloudWithIntensities(msg);
+  return LaserScanToPointCloudWithIntensities(msg); // 使用模板函数实现不同功能
 }
 
 // 由ros格式的PointCloud2转成carto格式的PointCloudWithIntensities
@@ -407,6 +415,11 @@ geometry_msgs::Point ToGeometryMsgPoint(const Eigen::Vector3d& vector3d) {
 // 将经纬度数据转换成ecef坐标系下的坐标
 Eigen::Vector3d LatLongAltToEcef(const double latitude, const double longitude,
                                  const double altitude) {
+  /*
+  * HT: 20240310:
+  * 输入参数,经,纬,高
+  * 计算方式可通过wiki百科
+  */
   // note: 地固坐标系(Earth-Fixed Coordinate System)也称地球坐标系, 
   // 是固定在地球上与地球一起旋转的坐标系.
   // 如果忽略地球潮汐和板块运动, 地面上点的坐标值在地固坐标系中是固定不变的.
@@ -441,7 +454,16 @@ Eigen::Vector3d LatLongAltToEcef(const double latitude, const double longitude,
  */
 cartographer::transform::Rigid3d ComputeLocalFrameFromLatLong(
     const double latitude, const double longitude) {
+      /*
+      * HT: 20240310
+      * 1. 计算第一帧GPS数据在 ECEF坐标系下远点的坐标变换.
+      */
   const Eigen::Vector3d translation = LatLongAltToEcef(latitude, longitude, 0.);
+  /*
+  * HT: 20240310
+  * 纬度减去90度,绕Y轴旋转.
+  * 经读取反,绕Z轴旋转
+  */
   const Eigen::Quaterniond rotation =
       Eigen::AngleAxisd(cartographer::common::DegToRad(latitude - 90.),
                         Eigen::Vector3d::UnitY()) *
