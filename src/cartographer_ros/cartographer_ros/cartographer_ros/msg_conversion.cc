@@ -124,17 +124,45 @@ sensor_msgs::PointCloud2 PreparePointCloud2Message(const int64_t timestamp,
   return msg;
 }
 
-// For sensor_msgs::LaserScan.
+
+/**
+ * @description: 
+ * HT: 20240320
+ * 兼容单线激光雷达和多会声波雷达
+ * For sensor_msgs::LaserScan.
+ * @return {*}
+ */
 bool HasEcho(float) { return true; }
 
+/**
+ * @description: 
+ * HT:20240320
+ * 兼容单线激光雷达和多会声波雷达
+ * @param {float} range
+ * @return {*}
+ */
 float GetFirstEcho(float range) { return range; }
 
-// For sensor_msgs::MultiEchoLaserScan.
+/**
+ * @description: For sensor_msgs::MultiEchoLaserScan.  
+ * HT: 20240320
+ * 兼容单线激光雷达和多会声波雷达
+ * 检查echoes字段是否有值
+ * @param {LaserEcho&} echo
+ * @return {*}
+ */
 bool HasEcho(const sensor_msgs::LaserEcho& echo) {
   return !echo.echoes.empty();
 }
 
 // 通过函数重载, 使得函数可以同时适用LaserScan与LaserEcho
+/**
+ * @description: 
+ * HT: 20240320
+ * 兼容单线激光雷达和多会声波雷达
+ * @param {LaserEcho&} echo
+ * @return {*}
+ */
 float GetFirstEcho(const sensor_msgs::LaserEcho& echo) {
   return echo.echoes[0];
 }
@@ -161,12 +189,24 @@ LaserScanToPointCloudWithIntensities(const LaserMessageType& msg) {
   for (size_t i = 0; i < msg.ranges.size(); ++i) {
     // c++11: 使用auto可以适应不同的数据类型
     const auto& echoes = msg.ranges[i];
+    /**
+     * @description: 
+     * HT:20240320
+     * HasEcho使用两种不同的类型
+     * @return {*}
+     */    
     if (HasEcho(echoes)) {
 
       const float first_echo = GetFirstEcho(echoes);
-      // 满足范围才进行使用
+      /**
+       * @description: 满足范围才进行使用
+       * HT: 20240320
+       * 最大最小判断
+       * @param {first_echo &&} first_echo
+       * @return {*}
+       */      
       if (msg.range_min <= first_echo && first_echo <= msg.range_max) {
-        const Eigen::AngleAxisf rotation(angle, Eigen::Vector3f::UnitZ());
+        const Eigen::AngleAxisf rotation(angle, Eigen::Vector3f::UnitZ()); // 绕Z轴旋转
         const cartographer::sensor::TimedRangefinderPoint point{
             rotation * (first_echo * Eigen::Vector3f::UnitX()), // position
             i * msg.time_increment};                            // time
@@ -192,14 +232,14 @@ LaserScanToPointCloudWithIntensities(const LaserMessageType& msg) {
   if (!point_cloud.points.empty()) {
     const double duration = point_cloud.points.back().time;
     // 以点云最后一个点的时间为点云的时间戳
-    timestamp += cartographer::common::FromSeconds(duration);
+    timestamp += cartographer::common::FromSeconds(duration); // duration代表整帧点云的时间(1 point-end point)
 
     // 让点云的时间变成相对值, 最后一个点的时间为0
     for (auto& point : point_cloud.points) {
       point.time -= duration;
     }
   }
-  return std::make_tuple(point_cloud, timestamp);
+  return std::make_tuple(point_cloud, timestamp); // 点云最后end point的时间戳作为整帧点云的时间戳
 }
 
 // 检查点云是否存在 field_name 字段
