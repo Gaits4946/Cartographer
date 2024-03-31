@@ -49,8 +49,12 @@
 
 namespace cartographer_ros {
 
+/*
+* HT: 20240323
+* 通过using指令，可以直接引用NodeId，而无需显式地指定命名空间
+*/
 // lx add
-using ::cartographer::mapping::NodeId;
+using ::cartographer::mapping::NodeId; 
 using ::cartographer::mapping::MapById;
 using ::cartographer::mapping::TrajectoryNode;
 

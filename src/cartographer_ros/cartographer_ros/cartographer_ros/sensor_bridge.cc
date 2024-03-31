@@ -227,6 +227,10 @@ void SensorBridge::HandleMultiEchoLaserScanMessage(
   carto::sensor::PointCloudWithIntensities point_cloud;
   carto::common::Time time;
   std::tie(point_cloud, time) = ToPointCloudWithIntensities(*msg); // 此函数被重载
+  /*
+  * HT: 20240331:
+  * time是每帧点云最后一包的时间戳
+  */
   HandleLaserScan(sensor_id, time, msg->header.frame_id, point_cloud);
 }
 
@@ -255,9 +259,13 @@ void SensorBridge::HandleLaserScan(
     return;
   }
   // CHECK_LE: 小于等于
-  CHECK_LE(points.points.back().time, 0.f);
+  CHECK_LE(points.points.back().time, 0.f); //检查每包点云的时间戳是否小于0, 正确的时间时间戳<=0
   // TODO(gaschler): Use per-point time instead of subdivisions.
 
+  /*
+  * HT: 20240331
+  *　num_subdivisions_per_laser_scan_含义是一帧点云数据分几次处理，传给HandleRangefinder
+  */
   // 意为一帧雷达数据被分成几次处理, 一般将这个参数设置为1
   for (int i = 0; i != num_subdivisions_per_laser_scan_; ++i) {
     const size_t start_index =
@@ -277,6 +285,12 @@ void SensorBridge::HandleLaserScan(
     const carto::common::Time subdivision_time =
         time + carto::common::FromSeconds(time_to_subdivision_end);
     
+    /*
+     * HT: 202302331 
+     * sensor_to_previous_subdivision_time_是上一帧点云的时间
+     * if检查点云时间戳的故障
+     * 雷达雷达会报此故障，因为雷神雷达时间戳是倒序的 
+    */
     auto it = sensor_to_previous_subdivision_time_.find(sensor_id);
     if (it != sensor_to_previous_subdivision_time_.end() &&
         // 上一段点云的时间不应该大于等于这一段点云的时间
@@ -314,6 +328,12 @@ void SensorBridge::HandleLaserScan(
 void SensorBridge::HandleRangefinder(
     const std::string& sensor_id, const carto::common::Time time,
     const std::string& frame_id, const carto::sensor::TimedPointCloud& ranges) {
+  /*
+   * HT: 20240331
+   * 1. 检查时间戳<0
+   * 2. 查找到雷达坐标系的变换
+   * 3. 将点云从雷达坐标系（ranges）转换到tracking坐标系下（sensor_to_tracking），通过函数TransformTimedPointCloud
+  */
   if (!ranges.empty()) {
     CHECK_LE(ranges.back().time, 0.f);
   }

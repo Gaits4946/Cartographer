@@ -319,7 +319,7 @@ ToPointCloudWithIntensities(const sensor_msgs::PointCloud2& msg) {
       for (const auto& point : pcl_point_cloud) {
         point_cloud.points.push_back(
             {Eigen::Vector3f{point.x, point.y, point.z}, 0.f}); // 没有时间信息就把时间填0
-        point_cloud.intensities.push_back(1.0f);
+        point_cloud.intensities.push_back(1.0f); // 没有强度信息，默认都是1
       }
     }
   }
@@ -329,6 +329,10 @@ ToPointCloudWithIntensities(const sensor_msgs::PointCloud2& msg) {
     const double duration = point_cloud.points.back().time;
     // 点云开始的时间 加上 第一个点到最后一个点的时间
     // 点云最后一个点的时间 作为整个点云的时间戳
+    /*
+    * HT: 20240331
+    * 每帧点云的时间戳,使用的是最后一包的点云,所以前面包的时间戳都是负数。
+    */
     timestamp += cartographer::common::FromSeconds(duration);
 
     for (auto& point : point_cloud.points) {
