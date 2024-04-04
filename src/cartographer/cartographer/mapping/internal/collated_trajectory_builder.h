@@ -95,6 +95,10 @@ class CollatedTrajectoryBuilder : public TrajectoryBuilderInterface {
       AddData(sensor::MakeDispatchable(sensor_id, landmark_data));
       return;
     }
+    /**
+     * HT： 20240404
+     * wrapped_trajectory_builder_ 就是global trajectory builder
+    */
     wrapped_trajectory_builder_->AddSensorData(sensor_id, landmark_data);
   }
 

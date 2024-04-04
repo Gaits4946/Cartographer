@@ -38,7 +38,11 @@
 
 namespace cartographer {
 namespace mapping {
-  
+
+/*
+* HT:2024040
+* 未命名namespace, 作用域被限制在本文件内
+*/  
 // c++11: 匿名命名空间, 作用域被限制在本文件内
 namespace { 
 
@@ -150,6 +154,14 @@ int MapBuilder::AddTrajectoryBuilder(
 
   // 3d的轨迹
   if (options_.use_trajectory_builder_3d()) {
+    /**
+     * HT: 20240404
+     * 3d轨迹建立的流程
+     * 1. 新建一个前端 local_trajectory_builder
+     * 2. 将3D前端 local_trajectory_builder 和3D位姿图 pose_graph_ 传入CollatedTrajectoryBuilder
+     * 3. 将3d local_trajectory_builder trajectory_options sensor_collator_ trajectory_id和expected_sensor_ids 传递到 CollatedTrajectoryBuilder 初始化
+     * 4. 最后把CollatedTrajectoryBuilder存入trajectory_builders_
+    */
     // local_trajectory_builder(前端)的初始化
     std::unique_ptr<LocalTrajectoryBuilder3D> local_trajectory_builder;
     if (trajectory_options.has_trajectory_builder_3d_options()) {
@@ -510,6 +522,10 @@ std::map<int, int> MapBuilder::LoadStateFromFile(
 }
 
 // 工厂函数
+/*
+* HT: 20240404: 
+* 工厂函数, 通过调用此函数，返回一个指定的数据结构(MapBuilderInterface)
+*/
 std::unique_ptr<MapBuilderInterface> CreateMapBuilder(
     const proto::MapBuilderOptions& options) {
   return absl::make_unique<MapBuilder>(options);

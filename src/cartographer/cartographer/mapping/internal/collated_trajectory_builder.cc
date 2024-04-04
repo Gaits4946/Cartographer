@@ -54,6 +54,10 @@ CollatedTrajectoryBuilder::CollatedTrajectoryBuilder(
       wrapped_trajectory_builder_(std::move(wrapped_trajectory_builder)),
       last_logging_time_(std::chrono::steady_clock::now()) {
         
+  /**
+   * HT: 20240404
+   * CollatedTrajectoryBuilder构造函数中最重要的作用是调用了, sensor_collator_的初始化
+  */
   // 获取topic的名字, 并根据参数配置决定是否加入LANDMARK与gps的topic
   absl::flat_hash_set<std::string> expected_sensor_id_strings;
   for (const auto& sensor_id : expected_sensor_ids) {

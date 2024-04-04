@@ -39,6 +39,12 @@ class MapBuilder : public MapBuilderInterface {
   MapBuilder(const MapBuilder &) = delete;
   MapBuilder &operator=(const MapBuilder &) = delete;
 
+  /*
+   * HT:20240404
+   * AddTrajectoryBuilder功能是开始一条轨迹，并返回轨迹ID
+   * 支持多个轨迹
+   * 调用顺序
+   */
   int AddTrajectoryBuilder(
       const std::set<SensorId> &expected_sensor_ids,
       const proto::TrajectoryBuilderOptions &trajectory_options,
@@ -65,6 +71,10 @@ class MapBuilder : public MapBuilderInterface {
   std::map<int, int> LoadStateFromFile(const std::string &filename,
                                        const bool load_frozen_state) override;
 
+  /*
+  * HT: 20240404
+  * 位姿图, cartographer中的pose_grap, 代表后端。
+  */
   mapping::PoseGraphInterface *pose_graph() override {
     return pose_graph_.get();
   }
@@ -92,7 +102,7 @@ class MapBuilder : public MapBuilderInterface {
 
   std::unique_ptr<sensor::CollatorInterface> sensor_collator_;
   std::vector<std::unique_ptr<mapping::TrajectoryBuilderInterface>>
-      trajectory_builders_;
+      trajectory_builders_; // 复杂的数据结构
   std::vector<proto::TrajectoryBuilderOptionsWithSensorIds>
       all_trajectory_builder_options_;
 };
