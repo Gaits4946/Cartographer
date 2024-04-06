@@ -32,6 +32,10 @@
 namespace cartographer {
 namespace common {
 
+/**
+ * HT: 20240405
+ * 特化后的模板类
+*/
 // Computes the rate at which pulses come in.
 template <typename ClockType = std::chrono::steady_clock>
 class RateTimer {

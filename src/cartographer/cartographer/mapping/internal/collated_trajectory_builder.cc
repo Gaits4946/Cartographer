@@ -95,6 +95,9 @@ void CollatedTrajectoryBuilder::AddData(std::unique_ptr<sensor::Data> data) {
  */
 void CollatedTrajectoryBuilder::HandleCollatedSensorData(
     const std::string& sensor_id, std::unique_ptr<sensor::Data> data) {
+      /**
+       * HT: 20240405
+      */
   auto it = rate_timers_.find(sensor_id);
   // 找不到就新建一个
   if (it == rate_timers_.end()) {

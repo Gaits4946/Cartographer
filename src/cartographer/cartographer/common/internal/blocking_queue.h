@@ -46,6 +46,9 @@ namespace common {
   复用：通过将生产者类和消费者类独立开来, 可以对生产者类和消费者类进行独立的复用与扩展
  */
 
+/**
+ * HT: 20240405
+*/
 template <typename T>
 class BlockingQueue {
  public:

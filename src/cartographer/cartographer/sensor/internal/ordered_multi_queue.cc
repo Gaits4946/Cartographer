@@ -118,7 +118,14 @@ QueueKey OrderedMultiQueue::GetBlocker() const {
  * 退出条件3 数据队列中数据的个数只有1个,又不是完成状态,不能确定状态, 就先退出
  */
 void OrderedMultiQueue::Dispatch() {
+  /**
+   * HT: 20240405
+  */
   while (true) {
+    /**
+     * HT: 20240405
+     * 下面的注释指代时间序列
+    */
     /*
       queues_: 
         (0, scan): {      4,     }
@@ -244,6 +251,9 @@ void OrderedMultiQueue::CannotMakeProgress(const QueueKey& queue_key) {
  */
 common::Time OrderedMultiQueue::GetCommonStartTime(const int trajectory_id) {
 
+  /**
+   * HT: 20240405
+  */
   // c++11: map::emplace() 返回的 pair 对象
   // pair 的成员变量 first 是一个指向插入元素或阻止插入的元素的迭代器
   // 成员变量 second 是个布尔值, 表示是否插入成功, 如果这个元素的索引已经存在插入会失败,返回false

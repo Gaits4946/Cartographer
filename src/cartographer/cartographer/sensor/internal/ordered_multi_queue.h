@@ -35,6 +35,9 @@ struct QueueKey {
   int trajectory_id;      // 轨迹id
   std::string sensor_id;  // topic名字
 
+  /**
+   * HT: 20240405
+  */
   // 重载小于运算符, map根据这个规则对QueueKey进行排序
   // 以tuple规则比较2者, tuple定义了<运算符, 逐个元素进行比较
   bool operator<(const QueueKey& other) const {
@@ -53,6 +56,10 @@ struct QueueKey {
 
 class OrderedMultiQueue {
  public:
+ /**
+  * HT:20240405
+  * 注意区分同名Callback函数
+ */
   // note: OrderedMultiQueue::Callback 1个参数
   using Callback = std::function<void(std::unique_ptr<Data>)>;
 

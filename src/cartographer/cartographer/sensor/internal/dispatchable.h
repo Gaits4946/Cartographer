@@ -1,4 +1,12 @@
 /*
+ * @Author: Gaits4946 1771317163@qq.com
+ * @Date: 2024-03-23 15:46:45
+ * @LastEditors: Gaits4946 1771317163@qq.com
+ * @LastEditTime: 2024-04-05 10:45:36
+ * @FilePath: \Cartographer\src\cartographer\cartographer\sensor\internal\dispatchable.h
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+/*
  * Copyright 2016 The Cartographer Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,6 +52,9 @@ class Dispatchable : public Data {
 };
 
 
+/**
+ * HT: 20240405
+*/
 // c++11: template <typename DataType> 
 // 函数模板的调用使用 实参推演 来进行
 // 类模板 模板形参的类型必须在类名后的尖括号中明确指定, 不能使用实参推演 
