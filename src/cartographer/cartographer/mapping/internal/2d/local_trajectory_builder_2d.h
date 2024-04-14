@@ -45,12 +45,21 @@ class LocalTrajectoryBuilder2D {
  public:
   // 将点云插入到地图后的result
   struct InsertionResult {
+    /**
+     * HT:20240413
+     * constant_data: 前端匹配所用的数据与计算出的local坐标系下的位姿
+     * insertion_submaps: 最多只有2个子图的指针
+    */
     std::shared_ptr<const TrajectoryNode::Data> constant_data;
     std::vector<std::shared_ptr<const Submap2D>> insertion_submaps; // 最多只有2个子图的指针
   };
   // 扫描匹配的result
   struct MatchingResult {
     common::Time time;
+    /**
+     * HT:20240413
+     * range_data_in_local: 经过扫描匹配之后位姿校准之后的雷达数据
+    */
     transform::Rigid3d local_pose;
     sensor::RangeData range_data_in_local; // 经过扫描匹配之后位姿校准之后的雷达数据
     // 'nullptr' if dropped by the motion filter.
@@ -102,14 +111,14 @@ class LocalTrajectoryBuilder2D {
   void InitializeExtrapolator(common::Time time);
 
   const proto::LocalTrajectoryBuilderOptions2D options_;
-  ActiveSubmaps2D active_submaps_;
+  ActiveSubmaps2D active_submaps_; /* 活跃的子图，始终之保持两个 */
 
   MotionFilter motion_filter_;
   scan_matching::RealTimeCorrelativeScanMatcher2D
-      real_time_correlative_scan_matcher_;
-  scan_matching::CeresScanMatcher2D ceres_scan_matcher_;
+      real_time_correlative_scan_matcher_;/* 匹配器 */
+  scan_matching::CeresScanMatcher2D ceres_scan_matcher_;/* ceres匹配器 */
 
-  std::unique_ptr<PoseExtrapolator> extrapolator_;
+  std::unique_ptr<PoseExtrapolator> extrapolator_;/* 位姿估计器 */
 
   int num_accumulated_ = 0;
   sensor::RangeData accumulated_range_data_;
@@ -118,7 +127,7 @@ class LocalTrajectoryBuilder2D {
   absl::optional<double> last_thread_cpu_time_seconds_;
   absl::optional<common::Time> last_sensor_time_;
 
-  RangeDataCollator range_data_collator_;
+  RangeDataCollator range_data_collator_;/* 雷达数据时间同步类 */
 };
 
 }  // namespace mapping

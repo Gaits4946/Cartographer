@@ -33,6 +33,11 @@ namespace {
 static auto* kLocalSlamMatchingResults = metrics::Counter::Null();
 static auto* kLocalSlamInsertionResults = metrics::Counter::Null();
 
+/**
+ * HT:202404113
+ * 类模板, 类模板不支持实参推演, 所以在类外指定模板参数的具体类型, 再进行类的实例化
+ * 使用两个工厂函数 CreateGlobalTrajectoryBuilder2D 和 CreateGlobalTrajectoryBuilder3D 构建
+ */
 template <typename LocalTrajectoryBuilder, typename PoseGraph>
 class GlobalTrajectoryBuilder : public mapping::TrajectoryBuilderInterface {
  public:

@@ -39,6 +39,15 @@ sensor::TimedPointCloudOriginData RangeDataCollator::AddRangeData(
     sensor::TimedPointCloudData timed_point_cloud_data) { // 第一次拷贝
   CHECK_NE(expected_sensor_ids_.count(sensor_id), 0);
 
+  /**
+   * HT:20240414
+   * 1. timed_point_cloud_data点云数据是以拷贝到副本的形式
+   * 2. 检查强度信息，从sensor_bridge传过来的数据的intensities为空
+   * 3. 如果同话题的点云, 还有没处理的, 就先处同步没处理的点云, 将当前点云保存
+   * 4. 先将当前点云添加到 等待时间同步的map中
+   * 5. 找到所有传感器数据中最早的时间戳(点云最后一个点的时间), 作为本次时间同步的结束时间
+  */
+
   // 从sensor_bridge传过来的数据的intensities为空
   timed_point_cloud_data.intensities.resize(
       timed_point_cloud_data.ranges.size(), kDefaultIntensityValue);
@@ -53,7 +62,7 @@ sensor::TimedPointCloudOriginData RangeDataCollator::AddRangeData(
     // the two (do not send out current).
     // 本次时间同步的结束时间为这帧点云数据的结束时间
     current_end_ = id_to_pending_data_.at(sensor_id).time;
-    auto result = CropAndMerge();
+    auto result = CropAndMerge(); /* 处理未处理的点云 */
     // 保存当前点云
     id_to_pending_data_.emplace(sensor_id, std::move(timed_point_cloud_data));
     return result;
@@ -77,11 +86,17 @@ sensor::TimedPointCloudOriginData RangeDataCollator::AddRangeData(
   // current_end_是本次时间同步的结束时间
   // 是待时间同步map中的 所有点云中最早的时间戳
   current_end_ = oldest_timestamp;
-  return CropAndMerge();
+  return CropAndMerge(); /* 处理点云 */
 }
 
 // 对时间段内的数据进行截取与合并, 返回时间同步后的点云
 sensor::TimedPointCloudOriginData RangeDataCollator::CropAndMerge() {
+  /**
+   * HT:20240414
+   * 对时间段内的数据进行截取与合并, 返回时间同步后的点云
+   * 1. 遍历所有的传感器话题
+   * 2. 对各传感器的点云 按照每个点的时间从小到大进行排序
+  */
   sensor::TimedPointCloudOriginData result{current_end_, {}, {}};
   bool warned_for_dropped_points = false;
   // 遍历所有的传感器话题

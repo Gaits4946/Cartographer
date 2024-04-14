@@ -1,4 +1,12 @@
 /*
+ * @Author: Gaits4946 1771317163@qq.com
+ * @Date: 2024-03-23 15:46:45
+ * @LastEditors: Gaits4946 1771317163@qq.com
+ * @LastEditTime: 2024-04-14 10:08:32
+ * @FilePath: \Cartographer\src\cartographer\cartographer\mapping\internal\range_data_collator.h
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+/*
  * Copyright 2018 The Cartographer Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +54,7 @@ class RangeDataCollator {
  private:
   sensor::TimedPointCloudOriginData CropAndMerge();
 
-  const std::set<std::string> expected_sensor_ids_;
+  const std::set<std::string> expected_sensor_ids_; /* 保存不重复ID */
   // Store at most one message for each sensor.
   std::map<std::string, sensor::TimedPointCloudData> id_to_pending_data_; // 待处理的数据
   common::Time current_start_ = common::Time::min();

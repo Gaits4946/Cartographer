@@ -65,6 +65,10 @@ sensor::RangeData
 LocalTrajectoryBuilder2D::TransformToGravityAlignedFrameAndFilter(
     const transform::Rigid3f& transform_to_gravity_aligned_frame,
     const sensor::RangeData& range_data) const {
+      /**
+       * HT: 20240414
+       * TransformRangeData坐标变换 将local坐标下的点云 转换到 坐标原点下
+      */
   // Step: 5 将原点位于机器人当前位姿处的点云 转成 原点位于local坐标系原点处的点云, 再进行z轴上的过滤
   const sensor::RangeData cropped =
       sensor::CropRangeData(sensor::TransformRangeData(
@@ -141,6 +145,18 @@ LocalTrajectoryBuilder2D::AddRangeData(
     const std::string& sensor_id,
     const sensor::TimedPointCloudData& unsynchronized_data) {
   
+  /**
+   * HT：20240414
+   * Step: 1 进行多个雷达点云数据的时间同步, 点云的坐标是相对于tracking_frame的
+   * Step: 2 预测出 每个点的时间戳时刻, tracking frame 在 local slam 坐标系下的位姿
+   * Step: 3 运动畸变的去除, 将相对于tracking_frame的hit坐标 转成 local坐标系下的坐标
+   * Step: 4 超过max_range时的处理: 用一个距离进行替代, 并放入misses里
+   * Step: 5 将原点位于机器人当前位姿处的点云 转成 原点位于local坐标系原点处的点云, 再进行z轴上的过滤
+   * Step: 6 对点云进行体素滤波
+   * Step: 7 对 returns点云 进行自适应体素滤波，返回的点云的数据类型是PointCloud
+   * Step: 8 将 原点位于local坐标系原点处的点云 变换成 原点位于匹配后的位姿处的点云
+  */
+
   // Step: 1 进行多个雷达点云数据的时间同步, 点云的坐标是相对于tracking_frame的
   auto synchronized_data =
       range_data_collator_.AddRangeData(sensor_id, unsynchronized_data);
@@ -172,7 +188,8 @@ LocalTrajectoryBuilder2D::AddRangeData(
       time +
       common::FromSeconds(synchronized_data.ranges.front().point_time.time);
   // 只有在extrapolator_初始化时, GetLastPoseTime()是common::Time::min()
-  if (time_first_point < extrapolator_->GetLastPoseTime()) {
+  if (time_first_point < extrapolator_->GetLastPoseTime()) { 
+    /* extrapolator_是位姿估计器 */
     LOG(INFO) << "Extrapolator is still initializing.";
     return nullptr;
   }
@@ -260,6 +277,7 @@ LocalTrajectoryBuilder2D::AddRangeData(
     num_accumulated_ = 0;
 
     // 获取机器人当前姿态
+    /* 相对姿态 */
     const transform::Rigid3d gravity_alignment = transform::Rigid3d::Rotation(
         extrapolator_->EstimateGravityOrientation(time));
 
