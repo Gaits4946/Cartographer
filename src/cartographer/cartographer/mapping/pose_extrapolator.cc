@@ -60,6 +60,10 @@ std::unique_ptr<PoseExtrapolator> PoseExtrapolator::InitializeWithImu(
 
 // 返回上次校准位姿的时间
 common::Time PoseExtrapolator::GetLastPoseTime() const {
+  /**
+   * HT:20240418
+   * 添加扫描匹配后的位姿队列
+  */
   // 如果尚未添加任何位姿, 则返回Time::min()
   if (timed_pose_queue_.empty()) {
     return common::Time::min();
@@ -78,6 +82,11 @@ common::Time PoseExtrapolator::GetLastExtrapolatedTime() const {
 // 将扫描匹配后的pose加入到pose队列中,计算线速度与角速度,并将imu_tracker_的状态更新到time时刻
 void PoseExtrapolator::AddPose(const common::Time time,
                                const transform::Rigid3d& pose) {
+  /**
+   * HT:20240420
+   * 对位姿进行校准，
+   * 通过match pose进行校准
+  */
   // 如果imu_tracker_没有初始化就先进行初始化
   if (imu_tracker_ == nullptr) {
     common::Time tracker_start = time;
@@ -96,7 +105,7 @@ void PoseExtrapolator::AddPose(const common::Time time,
   while (timed_pose_queue_.size() > 2 && // timed_pose_queue_最少是2个数据
          timed_pose_queue_[1].time <= time - pose_queue_duration_) {
     timed_pose_queue_.pop_front();
-  }
+  } //pose_queue_duration_ = 0.001s
 
   // 根据加入的pose计算线速度与角速度
   UpdateVelocitiesFromPoses();
@@ -157,7 +166,7 @@ void PoseExtrapolator::AddOdometryData(
   if (timed_pose_queue_.empty()) {
     return;
   }
-  // 平移量除以时间得到 tracking frame 的线速度, 只在x方向有数值
+  // 如果是机器人: 平移量除以时间得到 tracking frame 的线速度, 只在x方向有数值
   const Eigen::Vector3d
       linear_velocity_in_tracking_frame_at_newest_odometry_time =
           odometry_pose_delta.translation() / odometry_time_delta;
@@ -167,7 +176,7 @@ void PoseExtrapolator::AddOdometryData(
   const Eigen::Quaterniond orientation_at_newest_odometry_time =
       timed_pose_queue_.back().pose.rotation() *
       ExtrapolateRotation(odometry_data_newest.time,
-                          odometry_imu_tracker_.get());
+                          odometry_imu_tracker_.get()); // ExtrapolateRotation姿态预测函数
   // 将tracking frame的线速度进行旋转, 得到 local 坐标系下 tracking frame 的线速度
   linear_velocity_from_odometry_ =
       orientation_at_newest_odometry_time *
@@ -200,7 +209,7 @@ Eigen::Quaterniond PoseExtrapolator::EstimateGravityOrientation(
   // 使得 imu_tracker 预测到time时刻
   AdvanceImuTracker(time, &imu_tracker);
   // 返回 imu_tracker 预测到的time时刻 的姿态
-  return imu_tracker.orientation();
+  return imu_tracker.orientation(); //orientation是机器人当前的姿态
 }
 
 // 根据pose队列计算tracking frame 在 local坐标系下的线速度与角速度
@@ -238,6 +247,11 @@ void PoseExtrapolator::UpdateVelocitiesFromPoses() {
 
 // 修剪imu的数据队列,丢掉过时的imu数据
 void PoseExtrapolator::TrimImuData() {
+  /**
+   * HT:20240418
+   * imu数据的裁剪
+   * 将imu数据第一个数去掉
+  */
   // 保持imu队列中第二个数据的时间要大于最后一个位姿的时间, imu_date_最少是1个
   while (imu_data_.size() > 1 && !timed_pose_queue_.empty() &&
          imu_data_[1].time <= timed_pose_queue_.back().time) {
@@ -272,13 +286,13 @@ void PoseExtrapolator::AdvanceImuTracker(const common::Time time,
     // 在time之前没有IMU数据, 因此我们推进ImuTracker, 并使用姿势和假重力产生的角速度来帮助2D稳定
     
     // 预测当前时刻的姿态与重力方向
-    imu_tracker->Advance(time);
+    imu_tracker->Advance(time); //Advance预测
     // 使用 假的重力数据对加速度的测量进行更新
     imu_tracker->AddImuLinearAccelerationObservation(Eigen::Vector3d::UnitZ());
     // 只能依靠其他方式得到的角速度进行测量值的更新
     imu_tracker->AddImuAngularVelocityObservation(
         odometry_data_.size() < 2 ? angular_velocity_from_poses_
-                                  : angular_velocity_from_odometry_);
+                                  : angular_velocity_from_odometry_); //不适用odometry时，odometry的size才会小于2
     return;
   }
 
@@ -298,6 +312,12 @@ void PoseExtrapolator::AdvanceImuTracker(const common::Time time,
         return imu_data.time < time;
       });
 
+/**
+ * HT:20240420
+ * 1. 预测
+ * 2. 根据线速度, 观测并校准
+ * 3. 更新角速度
+*/
   // 然后依次对imu数据进行预测, 以及添加观测, 直到imu_data_的时间大于等于time截止
   while (it != imu_data_.end() && it->time < time) {
     // 预测出当前时刻的姿态与重力方向

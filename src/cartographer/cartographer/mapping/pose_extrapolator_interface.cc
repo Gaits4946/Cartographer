@@ -67,6 +67,11 @@ proto::ImuBasedPoseExtrapolatorOptions CreateImuBasedPoseExtrapolatorOptions(
 
 proto::PoseExtrapolatorOptions CreatePoseExtrapolatorOptions(
     common::LuaParameterDictionary* const parameter_dictionary) {
+        /**
+         * HT:20240418
+         * 根据传入lua字典，将具体参数获取的值
+         * 赋值给PoseExtrapolatorOptions格式的数据结构
+        */
   proto::PoseExtrapolatorOptions options;
   options.set_use_imu_based(parameter_dictionary->GetBool("use_imu_based"));
   *options.mutable_constant_velocity() =

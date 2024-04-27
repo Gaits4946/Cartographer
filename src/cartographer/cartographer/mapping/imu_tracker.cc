@@ -38,7 +38,7 @@ ImuTracker::ImuTracker(const double imu_gravity_time_constant,
     : imu_gravity_time_constant_(imu_gravity_time_constant),
       time_(time),
       last_linear_acceleration_time_(common::Time::min()),
-      orientation_(Eigen::Quaterniond::Identity()), // 初始方向角
+      orientation_(Eigen::Quaterniond::Identity()), // 初始方向角[0,0,0]
       gravity_vector_(Eigen::Vector3d::UnitZ()),    // 重力方向初始化为[0,0,1]
       imu_angular_velocity_(Eigen::Vector3d::Zero()) {}
 
@@ -92,6 +92,12 @@ void ImuTracker::AddImuLinearAccelerationObservation(
   gravity_vector_ =
       (1. - alpha) * gravity_vector_ + alpha * imu_linear_acceleration;
       
+  /**
+   * HT: 20240420
+   * orientation_指当前机器人的姿态
+   * 举例: 右手坐标系，前左上[0,0,9.8], Y轴顺时针90度，得上左后[9.8,0,0];
+   * 根据当前线性加速度对之前的线性加速度进行校准
+  */
   // Change the 'orientation_' so that it agrees with the current
   // 'gravity_vector_'.
   // Step: 4 求得 线性加速度的值 与 由上一时刻姿态求出的线性加速度 间的旋转量
@@ -101,6 +107,10 @@ void ImuTracker::AddImuLinearAccelerationObservation(
   // Step: 5 使用这个旋转量来校准当前的姿态
   orientation_ = (orientation_ * rotation).normalized();
 
+  /**
+   * HT: 20240420
+   * orientation_和gravity_vector_是相反的
+  */
   // note: glog CHECK_GT: 第一个参数要大于第二个参数
   // 如果线性加速度与姿态均计算完全正确,那这二者的乘积应该是 0 0 1
   CHECK_GT((orientation_ * gravity_vector_).z(), 0.);

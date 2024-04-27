@@ -57,6 +57,9 @@ class Rigid2 {
 
   static Rigid2<FloatType> Identity() { return Rigid2<FloatType>(); }
 
+  /**
+   * HT: 20240418
+  */
   /* c++11: .template 调用模板类的模板成员函数前必须加template关键字的情况
     当要使用模板类中的模板函数时, 如果同时满足下面两个条件:
       1.如果模板类的模板参数是不确定类型时（int和非模板类等是确定类型）
