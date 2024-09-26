@@ -116,6 +116,10 @@ PrecomputationGrid2D::PrecomputationGrid2D(
   std::vector<float>& intermediate = *reusable_intermediate_grid;
   intermediate.resize(wide_limits_.num_x_cells * limits.num_y_cells);
   
+  /**
+   * HT:20240714
+   * 滑动窗口，建议拿出来单独run一下test_SlidingWindowMaximum
+  */
   // 对每一行从左到右横着做一次滑窗, 将滑窗后的地图放在intermediate(临时数据)中
   for (int y = 0; y != limits.num_y_cells; ++y) {
     SlidingWindowMaximum current_values;

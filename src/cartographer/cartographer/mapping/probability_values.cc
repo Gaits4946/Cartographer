@@ -113,7 +113,7 @@ std::vector<uint16> ComputeLookupTableToApplyCorrespondenceCostOdds(
             ProbabilityToCorrespondenceCost(ProbabilityFromOdds(
                 odds * Odds(CorrespondenceCostToProbability(
                            (*kValueToCorrespondenceCost)[cell]))))) +
-        kUpdateMarker);
+        kUpdateMarker); //kValueToCorrespondenceCost是空闲的概率
   }
   return result;
 }

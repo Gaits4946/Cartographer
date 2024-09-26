@@ -106,6 +106,12 @@ RealTimeCorrelativeScanMatcher2D::GenerateExhaustiveSearchCandidates(
   std::vector<Candidate2D> candidates;
   candidates.reserve(num_candidates);
 
+  /**
+   * HT:20240504
+   * 第一层遍历角度
+   * 第二层遍历x
+   * 第三层遍历y
+  */
   // 生成候选解, 候选解是由像素坐标的偏差组成的
   for (int scan_index = 0; scan_index != search_parameters.num_scans;
        ++scan_index) {
@@ -139,6 +145,17 @@ double RealTimeCorrelativeScanMatcher2D::Match(
     const sensor::PointCloud& point_cloud, const Grid2D& grid,
     transform::Rigid2d* pose_estimate) const {
   CHECK(pose_estimate != nullptr);
+
+  /**
+   * HT:20240504
+   * Step: 1 将点云旋转到预测的方向上
+   * Step: 2 生成按照不同角度旋转后的点云集合
+   * Step: 3 将旋转后的点云集合按照预测出的平移量进行平移, 获取平移后的点在地图中的索引
+   * Step: 4 生成所有的候选解
+   * Step: 5 计算所有候选解的加权得分
+   * Step: 6 获取最优解
+   * Step: 7 将计算出的偏差量加上原始位姿获得校正后的位姿
+  */
 
   // Step: 1 将点云旋转到预测的方向上
   const Eigen::Rotation2Dd initial_rotation = initial_pose_estimate.rotation();

@@ -118,7 +118,7 @@ std::unique_ptr<Grid2D> ProbabilityGrid::ComputeCroppedGrid() const {
   const double resolution = limits().resolution();
   // 重新计算最大值坐标
   const Eigen::Vector2d max =
-      limits().max() - resolution * Eigen::Vector2d(offset.y(), offset.x());
+      limits().max() - resolution * Eigen::Vector2d(offset.y(), offset.x());// limits().max()是cartographer地图的像素坐标系的坐标原点, 最接近左上角的值
   // 重新定义概率栅格地图的大小
   std::unique_ptr<ProbabilityGrid> cropped_grid =
       absl::make_unique<ProbabilityGrid>(

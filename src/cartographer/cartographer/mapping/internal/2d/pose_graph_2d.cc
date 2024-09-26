@@ -386,6 +386,10 @@ void PoseGraph2D::ComputeConstraint(const NodeId& node_id,
         data_.trajectory_connectivity_state.LastConnectionTime(
             node_id.trajectory_id, submap_id.trajectory_id);
 
+    /**
+     * HT:20240707
+     * if判断的作用是减少计算量
+    */
     // 如果节点和子图属于同一轨迹, 或者时间小于阈值
     // 则只需进行 局部搜索窗口 的约束计算(对局部子图进行回环检测)
     if (node_id.trajectory_id == submap_id.trajectory_id ||
@@ -533,6 +537,11 @@ WorkItem::Result PoseGraph2D::ComputeConstraintsForNode(
   // Step: 当前节点与所有已经完成的子图进行约束的计算---实际上就是回环检测
   for (const auto& submap_id : finished_submap_ids) {
     // 计算旧的submap和新的节点间的约束
+    /**
+     * HT:20240707
+     * 节点与节点, 子图与子图之间是不能形成约束的
+     * 只能是子图和节点间形成约束 
+    */
     ComputeConstraint(node_id, submap_id);
   }
 

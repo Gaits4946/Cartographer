@@ -33,6 +33,11 @@ namespace mapping {
 proto::GridOptions2D CreateGridOptions2D(
     common::LuaParameterDictionary* const parameter_dictionary);
 
+/**
+ * HT:20240501
+ * PROBABILITY_GRID:概率栅格地图;
+ * TSDF:体素栅格地图, cartogrpher中使用的比较少;
+*/
 enum class GridType { PROBABILITY_GRID, TSDF };
 
 class Grid2D : public GridInterface {
@@ -120,12 +125,26 @@ class Grid2D : public GridInterface {
   }
 
  private:
+ /**
+  * HT:20240501
+  * 栅格地图的边界, 包括x和y最大值, 分辨率, x和y方向栅格数
+  * 栅格的bounding box, 存的是像素坐标
+  * 栅格的值, 存储的是free的概率转成uint16后的[0, 32767]范围内的值, 0代表未知
+ */
   MapLimits limits_;  // 地图大小边界, 包括x和y最大值, 分辨率, x和y方向栅格数
 
+  /**
+   * HT:20240501
+   * 栅格的值, 存储的是free的概率转成uint16后的[0, 32767]范围内的值, 0代表未知
+  */
   // 地图栅格值, 存储的是free的概率转成uint16后的[0, 32767]范围内的值, 0代表未知
   std::vector<uint16> correspondence_cost_cells_; 
   float min_correspondence_cost_;
   float max_correspondence_cost_;
+
+  // 栅格的bounding box, 存的是像素坐标
+  std::vector<uint16> unknown_cells_;  // 未知栅格的值
+
   std::vector<int> update_indices_;               // 记录已经更新过的索引
 
   // Bounding box of known cells to efficiently compute cropping limits.

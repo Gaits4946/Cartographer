@@ -69,7 +69,7 @@ void CastRays(const sensor::RangeData& range_data,
   GrowAsNeeded(range_data, probability_grid);
 
   const MapLimits& limits = probability_grid->limits();
-  const double superscaled_resolution = limits.resolution() / kSubpixelScale;
+  const double superscaled_resolution = limits.resolution() / kSubpixelScale; //原始坐标系的1000分之1的分辨率
   const MapLimits superscaled_limits(
       superscaled_resolution, limits.max(),
       CellLimits(limits.cell_limits().num_x_cells * kSubpixelScale,

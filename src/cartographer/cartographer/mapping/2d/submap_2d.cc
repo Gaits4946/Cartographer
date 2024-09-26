@@ -149,7 +149,7 @@ void Submap2D::ToResponseProto(
   response->set_submap_version(num_range_data());
   // note: const在*后边, 指针指向的地址不能变,而内存单元中的内容可变
   proto::SubmapQuery::Response::SubmapTexture* const texture =
-      response->add_textures();
+      response->add_textures(); // const在*后面，修饰的是指针，指向的地址是不能变，但是内容可变
   // 填充压缩后的数据
   grid()->DrawToSubmapTexture(texture, local_pose());
 }
@@ -236,11 +236,11 @@ std::unique_ptr<GridInterface> ActiveSubmaps2D::CreateGrid(
     // 概率栅格地图
     case proto::GridOptions2D::PROBABILITY_GRID:
       return absl::make_unique<ProbabilityGrid>(
-          MapLimits(resolution,
+          MapLimits(resolution, // lua脚本中配置分辨率, traectory_builder_2d.lua, 值越小，占用内存越大
                     // 左上角坐标为坐标系的最大值, origin位于地图的中间
                     origin.cast<double>() + 0.5 * kInitialSubmapSize *
                                                 resolution *
-                                                Eigen::Vector2d::Ones(),
+                                                Eigen::Vector2d::Ones(), // 坐标的最大值
                     CellLimits(kInitialSubmapSize, kInitialSubmapSize)),
           &conversion_tables_);
     // tsdf地图
@@ -271,8 +271,14 @@ void ActiveSubmaps2D::AddSubmap(const Eigen::Vector2f& origin) {
     // reduce peak memory usage a bit.
     CHECK(submaps_.front()->insertion_finished());
     // 删掉第一个子图的指针
-    submaps_.erase(submaps_.begin());
+    submaps_.erase(submaps_.begin()); //删除子图指针，子图还在
   }
+  /**
+   * HT:20240501
+   * origin: 坐标原点
+   * Grid2D: 栅格地图
+   * conversion_tables_: 
+  */
   // 新建一个子图, 并保存指向新子图的智能指针
   submaps_.push_back(absl::make_unique<Submap2D>(
       origin,

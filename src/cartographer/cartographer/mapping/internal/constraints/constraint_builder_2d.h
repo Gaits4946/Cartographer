@@ -166,6 +166,10 @@ class ConstraintBuilder2D {
       GUARDED_BY(mutex_);
   std::map<SubmapId, common::FixedRatioSampler> per_submap_sampler_;
 
+  /**
+   * HT: 20240707
+   * 和前端的相同
+  */
   scan_matching::CeresScanMatcher2D ceres_scan_matcher_;
 
   // Histogram of scan matcher scores.

@@ -99,6 +99,10 @@ void ConstraintBuilder2D::MaybeAddConstraint(
       options_.max_constraint_distance()) { // param: max_constraint_distance
     return;
   }
+  /**
+   * HT:20240707
+   * 减少计算量
+  */
   // 根据参数配置添加约束的频率
   if (!per_submap_sampler_
            .emplace(std::piecewise_construct, std::forward_as_tuple(submap_id),
@@ -236,6 +240,10 @@ ConstraintBuilder2D::DispatchScanMatcherConstruction(const SubmapId& submap_id,
   submap_scan_matcher.grid = grid;
 
   auto& scan_matcher_options = options_.fast_correlative_scan_matcher_options();
+  /**
+   * HT:20240707
+   * 设置一个任务scan_matcher_task，放入线程池等待调用
+  */
   auto scan_matcher_task = absl::make_unique<common::Task>();
   // 生成一个将初始化匹配器的任务, 初始化时会计算多分辨率地图, 比较耗时
   scan_matcher_task->SetWorkItem(

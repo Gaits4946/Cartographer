@@ -1,4 +1,12 @@
 /*
+ * @Author: Gaits4946 1771317163@qq.com
+ * @Date: 2024-03-23 15:46:45
+ * @LastEditors: Gaits4946 1771317163@qq.com
+ * @LastEditTime: 2024-05-04 22:42:22
+ * @FilePath: \Cartographer\src\cartographer\cartographer\mapping\internal\2d\scan_matching\translation_delta_cost_functor_2d.h
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+/*
  * Copyright 2016 The Cartographer Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,8 +40,8 @@ class TranslationDeltaCostFunctor2D {
   static ceres::CostFunction* CreateAutoDiffCostFunction(
       const double scaling_factor, const Eigen::Vector2d& target_translation) {
     return new ceres::AutoDiffCostFunction<TranslationDeltaCostFunctor2D,
-                                           2 /* residuals */,
-                                           3 /* pose variables */>(
+                                           2 /* residuals，残差维度 */,
+                                           3 /* pose variables，位移维度 */>(
         new TranslationDeltaCostFunctor2D(scaling_factor, target_translation));
   }
 

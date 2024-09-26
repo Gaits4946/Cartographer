@@ -108,15 +108,23 @@ std::unique_ptr<transform::Rigid2d> LocalTrajectoryBuilder2D::ScanMatch(
         pose_prediction, filtered_gravity_aligned_point_cloud,
         *matching_submap->grid(), &initial_ceres_pose);
     kRealTimeCorrelativeScanMatcherScoreMetric->Observe(score);
-  }
+  } //基于暴力搜索的扫描匹配
 
   auto pose_observation = absl::make_unique<transform::Rigid2d>();
   ceres::Solver::Summary summary;
   // 使用ceres进行扫描匹配
+  /**
+   * HT:20240504
+   * pose_prediction.translation()只包括平移
+   * initial_ceres_pose包括平移和旋转
+   * filtered_gravity_aligned_point_cloud点云
+   * *matching_submap->grid()地图
+   * pose_observation.get()匹配后的结果
+  */
   ceres_scan_matcher_.Match(pose_prediction.translation(), initial_ceres_pose,
                             filtered_gravity_aligned_point_cloud,
                             *matching_submap->grid(), pose_observation.get(),
-                            &summary);
+                            &summary); //基於優化的掃描匹配
   // 一些度量
   if (pose_observation) {
     kCeresScanMatcherCostMetric->Observe(summary.final_cost);

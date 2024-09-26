@@ -53,6 +53,11 @@ namespace mapping {
  * cartographer地图的像素坐标系: 左上角为原点, 向右为x正方向, 向下为y正方向
  */
 class MapLimits {
+  /**
+   * HT:2024051
+   * Vector2f 结构的是物理坐标
+   * Array2i 结构的是像素坐标
+  */
  public:
   /**
    * @brief 构造函数
@@ -95,8 +100,8 @@ class MapLimits {
     // and contains (centered_max_x, centered_max_y). We need to flip and
     // rotate.
     return Eigen::Array2i(
-        common::RoundToInt((max_.y() - point.y()) / resolution_ - 0.5),
-        common::RoundToInt((max_.x() - point.x()) / resolution_ - 0.5));
+        common::RoundToInt((max_.y() - point.y()) / resolution_ - 0.5), // 获取x的分辨率率，参考坐标系
+        common::RoundToInt((max_.x() - point.x()) / resolution_ - 0.5)); // 获取y的分辨率，参考坐标系
   }
 
   // Returns the center of the cell at 'cell_index'.

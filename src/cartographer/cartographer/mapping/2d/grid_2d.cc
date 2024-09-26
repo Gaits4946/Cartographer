@@ -67,7 +67,7 @@ proto::GridOptions2D CreateGridOptions2D(
  */
 Grid2D::Grid2D(const MapLimits& limits, float min_correspondence_cost,
                float max_correspondence_cost,
-               ValueConversionTables* conversion_tables)
+               ValueConversionTables* conversion_tables) //conversion_tables指针在此做了初始化
     : limits_(limits),
       correspondence_cost_cells_(
           limits_.cell_limits().num_x_cells * limits_.cell_limits().num_y_cells,

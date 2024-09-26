@@ -102,6 +102,10 @@ void CeresScanMatcher2D::Match(const Eigen::Vector2d& target_translation,
       break;
   }
 
+  /**
+   * HT:20240504
+   * 如果调残始终不理想，可以把下面2个CHECK_GT和problem注释掉
+  */
   // 平移的残差
   CHECK_GT(options_.translation_weight(), 0.);
   problem.AddResidualBlock(
